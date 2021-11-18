@@ -52,13 +52,23 @@ public class EchoServer {
         System.out.println("New client is connected");
     }
 
-    public void readMessage (SelectionKey key) throws IOException {
+    public void readMessage(SelectionKey key) throws IOException {
         SocketChannel client = (SocketChannel) key.channel();
         ByteBuffer byteBuffer = ByteBuffer.allocate(256);
         client.read(byteBuffer);
-//        String message = new String(byteBuffer.array());
-//        byteBuffer.flip();
+//        String readMessage = new String(byteBuffer.array());
         client.write(byteBuffer.flip());
         byteBuffer.clear();
+/*
+        String writeMessage = "ECHO: " + readMessage + LocalDateTime.now() + "\n";
+        byteBuffer.put(writeMessage.getBytes());
+        byteBuffer.flip();
+        client.write(byteBuffer);
+
+        byteBuffer.put(("[ECHO] " + readMessage.trim() + "\n").getBytes());
+        byteBuffer.flip();
+        client.write(byteBuffer);
+        byteBuffer.clear();
+*/
     }
 }
