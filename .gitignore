@@ -1,0 +1,7 @@
+# Project exclude paths
+/homework1/io-client/target/
+/homework1/nio-server/target/
+.idea
+*.iws
+*.iml
+*.ipr
