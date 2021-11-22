@@ -29,7 +29,6 @@ public class EchoClient extends JFrame {
             new Thread(() -> {
                 try {
                     while (true) {
-
                         String msgFromServer = in.readUTF();
                         if (msgFromServer.equalsIgnoreCase("/end")) {
                             break;
