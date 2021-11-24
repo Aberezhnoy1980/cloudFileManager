@@ -7,9 +7,10 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.LineBasedFrameDecoder;
-import io.netty.handler.codec.string.StringDecoder;
-import io.netty.handler.codec.string.StringEncoder;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.codec.LengthFieldPrepender;
+import io.netty.handler.codec.bytes.ByteArrayDecoder;
+import io.netty.handler.codec.bytes.ByteArrayEncoder;
 
 public class EchoServer {
     public static void main(String[] args) throws InterruptedException {
@@ -28,15 +29,15 @@ public class EchoServer {
                         @Override
                         protected void initChannel(NioSocketChannel ch) {
                             ch.pipeline().addLast(
-                                    new LineBasedFrameDecoder(128), // пакет определятся по переносу строки
-//                                new LengthFieldBasedFrameDecoder(512,0,2,0,2),
-//                                new LengthFieldPrepender(2), // пакет определятся по длине сообщения
-//                                new ByteArrayDecoder(), // массив байтов в ByteBuf
-//                                new ByteArrayEncoder(),
-//                                new EchoServerStringDecoder(), // собственный декодер для преобразования байтов в строку
-//                                new EchoServerStringEncoder(), // собственный Encoder для преобразования строк в байты
-                                    new StringDecoder(), // преобразует входящий трафик байтов в строки
-                                    new StringEncoder(), // преобразует исходящий трафик байтов в строки
+//                                    new LineBasedFrameDecoder(128), // пакет определятся по переносу строки
+                                    new LengthFieldBasedFrameDecoder(512, 0, 2, 0, 2),
+                                    new LengthFieldPrepender(2), // пакет определятся по длине сообщения
+                                    new ByteArrayDecoder(), // массив байтов в ByteBuf
+                                    new ByteArrayEncoder(),
+                                    new EchoServerStringDecoder(), // собственный декодер для преобразования байтов в строку
+                                    new EchoServerStringEncoder(), // собственный Encoder для преобразования строк в байты
+//                                    new StringDecoder(), // преобразует входящий трафик байтов в строки
+//                                    new StringEncoder(), // преобразует исходящий трафик байтов в строки
                                     new EchoServerChannelInboundHandler()
                             );
 
