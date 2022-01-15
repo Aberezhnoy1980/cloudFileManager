@@ -16,17 +16,4 @@
         <module>netty-server</module>
     </modules>
 
-    <properties>
-        <maven.compiler.source>15</maven.compiler.source>
-        <maven.compiler.target>15</maven.compiler.target>
-    </properties>
-
-    <dependencies>
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-all</artifactId>
-            <version>4.1.70.Final</version>
-        </dependency>
-    </dependencies>
-
 </project>
