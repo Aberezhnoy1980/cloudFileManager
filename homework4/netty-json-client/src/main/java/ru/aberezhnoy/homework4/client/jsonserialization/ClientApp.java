@@ -12,7 +12,6 @@ import ru.aberezhnoy.homework4.commons.message.*;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.nio.channels.SocketChannel;
 
 public class ClientApp {
     public static void main(String[] args) {

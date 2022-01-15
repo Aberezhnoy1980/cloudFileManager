@@ -7,13 +7,19 @@ import ru.aberezhnoy.homework4.commons.message.*;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.sql.SQLOutput;
+import java.util.concurrent.Executor;
 
 public class JsonServerChannelInboundHandler extends SimpleChannelInboundHandler<Message> {
 
-    private static final String FILE_NAME = "/Users/alex/Documents/Учеба/IDEA/network-storage/cloudFileManager/Apache_OpenOffice_4.1.11_MacOS_x86-64_langpack_ru.dmg";
+    private static final String FILE_NAME = "/Users/alex/Documents/Учеба/IDEA/network-storage/cloudFileManager/Docker._Big_episode.pdf";
 
     private static final int BUFFER_SIZE = 1024 * 64;
+
+    private final Executor executor;
+
+    public JsonServerChannelInboundHandler(Executor executor) {
+        this.executor = executor;
+    }
 
     @Override
     public void channelRegistered(ChannelHandlerContext ctx) {
@@ -48,37 +54,41 @@ public class JsonServerChannelInboundHandler extends SimpleChannelInboundHandler
             ctx.writeAndFlush(msg);
         }
         if (msg instanceof RequestFileMessage) {
-            try (var randomAccessFile = new RandomAccessFile(FILE_NAME, "r")) {
-                final long fileLength = randomAccessFile.length();
-                do {
-                    var position = randomAccessFile.getFilePointer();
+            executor.execute(() -> {
+                try (var randomAccessFile = new RandomAccessFile(FILE_NAME, "r")) {
+                    final long fileLength = randomAccessFile.length();
+                    do {
+                        var position = randomAccessFile.getFilePointer();
 
-                    final long availableBytes = fileLength - position;
-                    byte[] bytes;
+                        final long availableBytes = fileLength - position;
+                        byte[] bytes;
 //                    boolean lastFrame = false;
 
-                    if (availableBytes >= BUFFER_SIZE) {
-                        bytes = new byte[BUFFER_SIZE];
-                    } else {
-                        bytes = new byte[(int) availableBytes];
+                        if (availableBytes >= BUFFER_SIZE) {
+                            bytes = new byte[BUFFER_SIZE];
+                        } else {
+                            bytes = new byte[(int) availableBytes];
 //                        lastFrame = true;
-                    }
+                        }
 
-                    randomAccessFile.read(bytes);
+                        randomAccessFile.read(bytes);
 
-                    final FileTransferMessage message = new FileTransferMessage();
-                    message.setContent(bytes);
-                    message.setStartPosition(position);
+                        final FileTransferMessage message = new FileTransferMessage();
+                        message.setContent(bytes);
+                        message.setStartPosition(position);
 //                    message.setEndOfFile(lastFrame);
 
-                    ctx.writeAndFlush(message);
+                        ctx.writeAndFlush(message).sync();
 
-                } while (randomAccessFile.getFilePointer() < fileLength);
+                    } while (randomAccessFile.getFilePointer() < fileLength);
 
-                ctx.writeAndFlush(new EndFileTransferMessage());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+                    ctx.writeAndFlush(new EndFileTransferMessage());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            });
         }
         if (msg instanceof DownloadFileRequestMessage) {
             var message = (DownloadFileRequestMessage) msg;
