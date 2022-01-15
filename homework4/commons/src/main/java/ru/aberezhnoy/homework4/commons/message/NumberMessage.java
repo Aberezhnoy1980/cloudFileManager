@@ -1,4 +1,4 @@
-package ru.aberezhnoy.homework4.commons.javaserialization.message;
+package ru.aberezhnoy.homework4.commons.message;
 
 public class NumberMessage extends Message{
     private int number;

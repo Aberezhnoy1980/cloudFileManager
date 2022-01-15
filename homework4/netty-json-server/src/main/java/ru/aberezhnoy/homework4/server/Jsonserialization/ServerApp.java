@@ -2,6 +2,7 @@ package ru.aberezhnoy.homework4.server.Jsonserialization;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -33,10 +34,10 @@ public class ServerApp {
                         @Override
                         protected void initChannel(NioSocketChannel ch) {
                             ch.pipeline().addLast(
-                                    new LengthFieldBasedFrameDecoder(1024 * 1024, 0, 2, 0, 2),
-                                    new LengthFieldPrepender(2),
-                                    new JsonEncoder(),
+                                    new LengthFieldBasedFrameDecoder(1024 * 1024, 0, 3, 0, 3),
+                                    new LengthFieldPrepender(3),
                                     new JsonDecoder(),
+                                    new JsonEncoder(),
                                     new JsonServerChannelInboundHandler()
                             );
                         }
@@ -44,11 +45,11 @@ public class ServerApp {
                     .option(ChannelOption.SO_BACKLOG, 128)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
 
-            Channel channel = server.bind(9000).sync().channel();
+            ChannelFuture future = server.bind(9000).sync();
 
             System.out.println("Server started");
 
-            channel.closeFuture().sync();
+            future.channel().closeFuture().sync();
         } finally {
             bossGroup.shutdownGracefully();
             workersGroup.shutdownGracefully();
